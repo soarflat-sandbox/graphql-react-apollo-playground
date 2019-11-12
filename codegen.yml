@@ -1,0 +1,48 @@
+# 出力先にファイルが既に存在する場合、ファイルを上書きする
+overwrite: true
+
+# GraphQLスキーマを指定する
+# 指定の方法は URL、JSON、`.graphql`ファイルなど様々
+# 参考: https://graphql-code-generator.com/docs/getting-started/schema-field#available-formats
+schema:
+  - ./graphql/schema.graphql
+
+# GraphQLドキュメント（クエリ、ミューテーション、サブスクリプション、フラグメント）を指定する
+# schema と同様で指定の方法はいくつかある
+# 参考: https://graphql-code-generator.com/docs/getting-started/documents-field#available-formats
+documents:
+  - ./graphql/queries/*.graphql
+  - ./graphql/mutations/*.graphql
+
+# 生成したファイルの出力パスを指定する
+generates:
+  ./server/gen/graphql-resolver-types.ts:
+    # ファイルを生成する時に利用するプラグイン
+    # プラグイン一覧: https://graphql-code-generator.com/docs/plugins/
+    plugins:
+      # GraphQL Schema に基づいた型を生成する（`@graphql-codegen/typescript`）
+      # 他のTypeScript関連のプラグインを利用する際にも必要
+      - typescript
+      # リゾルバの型を生成する（`@graphql-codegen/typescript-resolvers`）
+      - typescript-resolvers
+  ./client/gen/graphql-client-api.tsx:
+    plugins:
+      - typescript
+      # GraphQLSchema と GraphQL operations、GraphQL fragments に基づいた型を生成する（`@graphql-codegen/typescript-operations`）
+      - typescript-operations
+      # React Apollo コンポーネントと TypeScript の HOC を生成する（`@graphql-codegen/typescript-react-apollo`）
+      - typescript-react-apollo
+    # 指定したプラグインに提供するオプション。そのため、利用するプラグインによって内容は異なる。
+    # 今回指定しているオプションはすべて typescript-react-apollo のもの
+    # https://graphql-code-generator.com/docs/plugins/typescript-react-apollo#configuration
+    config:
+      # 生成されたコンポーネントを無効にする
+      withComponent: false
+      # 生成された React Hooks を有効にする
+      withHooks: true
+      # 生成された HOC を無効にする
+      withHOC: false
+  ./graphql/schema.json:
+    plugins:
+      # GraphQL Schema に基づいてイントロスペクションファイルを生成する（`@graphql-codegen/introspec`）
+      - introspection
